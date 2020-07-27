@@ -1,0 +1,18 @@
+{%- let kind %}
+{%- let op %}
+{%- if graph.is_directed %}
+    {%- let kind = "digraph" %}
+    {%- let op = "->" %}
+{%- else %}
+    {%- let kind = "graph" %}
+    {%- let op = "--" %}
+{%- endif -%}
+{{ kind }} {
+    {% for u in 1..=graph.n %}
+        {{- u }}
+    {% endfor %}
+    {% for e in graph.edges %}
+        {%- let w = e.weight %}
+        {{- e.from }} {{ op }} {{ e.to }} {%- if w.is_some() %} [label = "{{ w.unwrap() }}"] {%- endif %}
+    {% endfor %}
+}
