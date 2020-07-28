@@ -1,21 +1,6 @@
 use askama::Template;
-use std::error::Error;
-use std::fmt::{self};
 use std::io::{self, BufRead, BufReader};
 use std::str::FromStr;
-
-// error
-
-#[derive(Debug, PartialEq, Eq)]
-pub struct AcGraphvizParseError;
-
-impl fmt::Display for AcGraphvizParseError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "invalid format")
-    }
-}
-
-impl Error for AcGraphvizParseError {}
 
 // graph
 
@@ -27,12 +12,12 @@ pub struct Edge {
 }
 
 impl FromStr for Edge {
-    type Err = AcGraphvizParseError;
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let e = s.trim().split(' ').collect::<Vec<_>>();
         if e.len() != 2 && e.len() != 3 {
-            return Err(Self::Err {});
+            return Err("invalid format".into());
         }
         let from = e[0];
         let to = e[1];
@@ -40,14 +25,14 @@ impl FromStr for Edge {
             if let Ok(w) = e[2].parse::<isize>() {
                 Some(w)
             } else {
-                return Err(Self::Err {});
+                return Err("not a number".into());
             }
         } else {
             None
         };
         match (from.parse::<usize>(), to.parse::<usize>()) {
             (Ok(from), Ok(to)) => Ok(Edge { from, to, weight }),
-            _ => Err(Self::Err {}),
+            _ => Err("not a number".into()),
         }
     }
 }
@@ -71,20 +56,20 @@ struct GraphTemplate {
 // <vertex_n> <graph_option>
 // <from> <to> [<weight>]
 // ...
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let reader = BufReader::new(io::stdin());
     let mut lines = reader.lines();
     let (n, is_directed) = if let Some(l) = lines.next() {
         let l = l?;
         let words = l.split(" ").collect::<Vec<_>>();
         if words.len() != 2 {
-            return Err(Box::new(AcGraphvizParseError {}));
+            return Err("invalid format".into());
         }
         let n = words[0].parse::<usize>()?;
         let is_directed = words[1].contains("d");
         (n, is_directed)
     } else {
-        return Err(Box::new(AcGraphvizParseError {}));
+        return Err("no input".into());
     };
     let mut edges = Vec::new();
     for l in lines {
@@ -105,7 +90,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 #[cfg(test)]
 mod tests {
     mod edge {
-        use crate::{AcGraphvizParseError, Edge};
+        use crate::Edge;
 
         #[test]
         fn parse_from_to() {
@@ -117,8 +102,8 @@ mod tests {
                     weight: None
                 })
             );
-            assert_eq!("1".parse::<Edge>(), Err(AcGraphvizParseError {}));
-            assert_eq!("-1 2".parse::<Edge>(), Err(AcGraphvizParseError {}));
+            assert!("1".parse::<Edge>().is_err());
+            assert!("-1 2".parse::<Edge>().is_err());
         }
 
         #[test]
@@ -139,7 +124,7 @@ mod tests {
                     weight: Some(-3)
                 })
             );
-            assert_eq!("1 2 x".parse::<Edge>(), Err(AcGraphvizParseError {}));
+            assert!("1 2 x".parse::<Edge>().is_err());
         }
     }
 }
