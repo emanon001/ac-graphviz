@@ -4,11 +4,11 @@ use std::str::FromStr;
 
 // graph
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Edge {
     pub from: usize,
     pub to: usize,
-    pub weight: Option<isize>,
+    pub weight: Option<f64>,
 }
 
 impl FromStr for Edge {
@@ -22,7 +22,7 @@ impl FromStr for Edge {
         let from = e[0];
         let to = e[1];
         let weight = if e.len() > 2 {
-            if let Ok(w) = e[2].parse::<isize>() {
+            if let Ok(w) = e[2].parse::<f64>() {
                 Some(w)
             } else {
                 return Err("not a number".into());
@@ -113,7 +113,7 @@ mod tests {
                 Ok(Edge {
                     from: 1,
                     to: 2,
-                    weight: Some(3)
+                    weight: Some(3_f64)
                 })
             );
             assert_eq!(
@@ -121,7 +121,15 @@ mod tests {
                 Ok(Edge {
                     from: 1,
                     to: 2,
-                    weight: Some(-3)
+                    weight: Some(-3_f64)
+                })
+            );
+            assert_eq!(
+                "1 2 3.45".parse::<Edge>(),
+                Ok(Edge {
+                    from: 1,
+                    to: 2,
+                    weight: Some(3.45_f64)
                 })
             );
             assert!("1 2 x".parse::<Edge>().is_err());
