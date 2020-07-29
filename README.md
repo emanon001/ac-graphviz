@@ -8,7 +8,7 @@ $ cargo install --git https://github.com/emanon001/ac-graphviz
 
 ## Usage
 
-#### format
+#### input format
 
 ```
 <vertex_number> <graph_option>
@@ -22,7 +22,7 @@ $ cargo install --git https://github.com/emanon001/ac-graphviz
 #### undirected graph
 
 ```shell
-ac-graphviz > output.dot
+$ ac-graphviz > output.dot
 2 _
 1 2 2
 2 1 1
@@ -43,7 +43,7 @@ graph {
 #### directed graph
 
 ```shell
-ac-graphviz > output.dot
+$ ac-graphviz > output.dot
 2 d
 1 2 2
 2 1 1
