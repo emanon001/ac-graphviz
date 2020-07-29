@@ -1,5 +1,11 @@
 # ac-graphviz
 
+## Installation
+
+```shell
+$ cargo install --git https://github.com/emanon001/ac-graphviz
+```
+
 ## Usage
 
 #### format
